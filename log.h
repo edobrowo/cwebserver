@@ -3,9 +3,13 @@
 
 #include <stdarg.h>
 
+#define INFO_ENABLED 1
+#define MORE_ENABLED 1
+#define ERRR_ENABLED 1
+
 typedef enum {
     INFO = 0,
-    WARN,
+    MORE,
     ERRR,
 } log_msg_t;
 

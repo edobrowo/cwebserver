@@ -47,7 +47,7 @@ int http_server_destroy(http_server_t* server) {
 
     int server_socket = server->socket;
     free(server);
-    wslog(INFO, "Server with socketfd (%d) destroyed", server_socket);
+    wslog(INFO, "Server with socket (%d) destroyed", server_socket);
     return 0;
 }
 
@@ -73,6 +73,6 @@ int http_server_listen(http_server_t* server, int port) {
         return err;
     }
 
-    wslog(INFO, "Server socket (%d) listening on port (%d)", server->socket, server->port);
+    wslog(INFO, "Server (%d) listening on port (%d)", server->socket, server->port);
     return 0;
 }
