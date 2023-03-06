@@ -2,4 +2,4 @@
 *.o
 *.out
 *.png
-images
+.vscode/
