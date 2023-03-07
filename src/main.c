@@ -32,6 +32,7 @@ int main() {
     // TODO: QOL serving static content
     // TODO: support larger file sizes
     // TODO: fix path field
+    // TODO: improve Makefile
 
     int client_socket;
     while (1) {
