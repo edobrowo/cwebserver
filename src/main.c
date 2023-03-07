@@ -30,6 +30,8 @@ int main() {
 
     // TODO: routing
     // TODO: QOL serving static content
+    // TODO: support larger file sizes
+    // TODO: fix path field
 
     int client_socket;
     while (1) {
@@ -64,10 +66,7 @@ int main() {
             return -1;
         }
 
-        // Print response contents
-        wslog(INFO, "\n%s", response->data);
-
-        err = send(client_socket, response->data, sizeof(response->data), 0);
+        err = send(client_socket, response->data, response->length * sizeof(char), 0);
         if (err == -1) {
             wslog(ERRR, "Could not send response data");
             return -1;

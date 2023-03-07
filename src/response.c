@@ -36,20 +36,19 @@ int response_serialize_content(response_t* response, const char* path) {
         return -1;
     }
 
-    response->data = realloc(response->data, (response->length + fs) * sizeof(char));
+    char* response_ptr_after_header = response->data + response->length;
+    response->length += fs + 1;
+    response->data = realloc(response->data, response->length * sizeof(char));
     if (!response->data) {
         wslog(ERRR, "Could not reallocate memory for response->data");
         return -1;
     }
 
-    char* response_ptr = response->data + response->length;
-    err = fread(response_ptr, sizeof(char), fs + 1, fp);
+    err = fread(response_ptr_after_header, sizeof(char), fs + 1, fp);
     if (!err) {
         wslog(ERRR, "Could not read from requested file");
         return -1;
     }
-    response_ptr += fs;
-    *response_ptr = '\0';
 
     err = fclose(fp);
     if (err) {
