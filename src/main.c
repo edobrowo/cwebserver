@@ -12,9 +12,9 @@
 #include "http_server.h"
 #include "log.h"
 #include "request.h"
+#include "response.h"
 
 int main() {
-
     int err;
     http_server_t *server = http_server_create();
     if (!server) {
@@ -31,30 +31,6 @@ int main() {
     // TODO: routing
     // TODO: QOL serving static content
 
-    // TODO: modularize response serialization
-    FILE* fp = fopen("example/index.html", "r");
-    if (!fp) {
-        return -1;
-    }
-
-    char response_contents_data[1024] = {0};
-    err = fread(response_contents_data, sizeof(char), 1024, fp);
-    if (!err) {
-        wslog(ERRR, "Could not read from requested file");
-        return -1;
-    }
-
-    err = fclose(fp);
-    if (err) {
-        wslog(ERRR, "Could not close requested file");
-        return -1;
-    }
-
-    char response_data[2048] = {0};
-    char response_header_data[1024] = "HTTP/1.1 200 OK\r\n\n";
-    strcat(response_data, response_header_data);
-    strcat(response_data, response_contents_data);
-
     int client_socket;
     while (1) {
         client_socket = accept(server->socket, NULL, NULL);
@@ -66,20 +42,32 @@ int main() {
             return -1;
         }
 
-        // wslog(INFO, "REQUEST\n%s", request_data);
         request_t* request = malloc(sizeof(request_t));
         if (!request) {
-            wslog(ERRR, "Memory for request could not be allocated");
+            wslog(ERRR, "Could not allocate memory for request");
             return -1;
         }
-
-        err = request_parse_header(request, request_data);
+        err = request_init(request, request_data);
         if (err) {
-            wslog(ERRR, "Could not parse header data");
+            wslog(ERRR, "Could not initialize request");
             return -1;
         }
 
-        err = send(client_socket, response_data, sizeof(response_data), 0);
+        response_t* response = malloc(sizeof(response_t));
+        if (!response) {
+            wslog(ERRR, "Could not allocate memory for response");
+            return -1;
+        }
+        err = response_init(response, request);
+        if (err) {
+            wslog(ERRR, "Could not initialize response");
+            return -1;
+        }
+
+        // Print response contents
+        wslog(INFO, "\n%s", response->data);
+
+        err = send(client_socket, response->data, sizeof(response->data), 0);
         if (err == -1) {
             wslog(ERRR, "Could not send response data");
             return -1;

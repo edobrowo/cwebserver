@@ -16,10 +16,11 @@ typedef enum {
 typedef struct {
     request_type_t type;
     const char* host;
-    const char* url;
+    const char* path;
 } request_t;
 
-// Parse an HTTP request. Currently just retrieves request type, host, and URL.
-int request_parse_header(request_t* request, char* buf);
+// Initialize a request from a header
+// Currently retrieves request type, host, and URL
+int request_init(request_t* request, char* buf);
 
 #endif // REQUEST

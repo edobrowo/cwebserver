@@ -19,7 +19,7 @@ http_server_t* http_server_create() {
 
     http_server_t* server = malloc(sizeof(http_server_t));
     if (!server) {
-        wslog(ERRR, "Memory for http_server_t could not be allocated");
+        wslog(ERRR, "Could not allocate memory for http_server_t");
         return NULL;
     }
 

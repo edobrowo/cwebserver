@@ -25,8 +25,8 @@ void request_extract_field(const char* field, char* name, char* value) {
     *name = '\0', *value = '\0';
 }
 
-int request_parse_header(request_t* request, char* buf) {
-    wslog(INFO, "Parsing request...");
+int request_init(request_t* request, char* buf) {
+    wslog(INFO, "Parsing request");
 
     char* type = strtok(buf, " ");
     request_type_t request_type = str_to_request_type(type);
@@ -35,6 +35,16 @@ int request_parse_header(request_t* request, char* buf) {
         return -1;
     }
     request->type = request_type;
+
+    // TODO: fix tokenizing of path
+    char* path = strtok(NULL, " ");
+    char* request_path = malloc(strlen(path) * sizeof(char));
+    if (!request_path) {
+        wslog(ERRR, "Could not allocate memory for request->path");
+        return -1;
+    }
+    strcpy(request_path, path);
+    request->path = request_path;
 
     char field[2048] = {0};
     char field_name[1024] = {0};
@@ -46,25 +56,17 @@ int request_parse_header(request_t* request, char* buf) {
         if (!strcmp(field_name, "Host")) {
             char* request_host = malloc(strlen(field_value) * sizeof(char));
             if (!request_host) {
-                wslog(ERRR, "Memory for request->host could not be allocated");
+                wslog(ERRR, "Could not allocate memory for request->host");
                 return -1;
             }
             strcpy(request_host, field_value);
             request->host = request_host;
         }
-        else if (!strcmp(field_name, "Referer")) {
-            char* request_url = malloc(strlen(field_value) * sizeof(char));
-            if (!request_url) {
-                wslog(ERRR, "Memory for request->url could not be allocated");
-                return -1;
-            }
-            strcpy(request_url, field_value);
-            request->url = request_url;
-        }
     }
 
     wslog(MORE, "Request type: %s", type);
     wslog(MORE, "Request host: %s", request->host);
-    wslog(MORE, "Request URL: %s", request->url);
+    wslog(MORE, "Request path: %s", request->path);
+
     return 0;
 }

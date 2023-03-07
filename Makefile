@@ -1,18 +1,18 @@
-STD=c99
+CC=gcc
+CFLAGS=-Iinclude
 
-CXX=gcc
-CXXFLAGS=-std=${std} -Werror -Wall -Wpedantic -MMD
+exec = server.out
+sources = $(wildcard src/*.c)
+objects = $(sources:.c=.o)
+flags = -g -Werror -Wall -Wpedantic -MMD -lm -ldl -fPIC -rdynamic -I./include
 
-OBJECTS=main.o http_server.o log.o request.o
-DEPENDS=${OBJECTS:.o=.d}
-EXEC=server.out
+$(exec): $(objects)
+	gcc $(objects) $(flags) -o $(exec)
 
-${EXEC}: ${OBJECTS}
-	${CXX} ${OBJECTS} -o ${EXEC}
-
--include ${DEPENDS}
+%.o: %.c %.h
+	gcc -c $(flags) $< -o $@
 
 .PHONY: clean
 
 clean:
-	rm ${OBJECTS} ${EXEC}
+	-rm $(objects) $(exec)

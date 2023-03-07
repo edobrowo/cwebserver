@@ -17,4 +17,7 @@ int http_server_destroy(http_server_t* server);
 // Listen to the given port on localhost
 int http_server_listen(http_server_t* server, int port);
 
+// Serve the specified static content
+int http_server_serve_static(http_server_t* server, const char* path);
+
 #endif // HTTP_SERVER
