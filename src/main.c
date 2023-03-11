@@ -28,13 +28,6 @@ int main() {
         return -1;
     }
 
-    // TODO: routing
-    // TODO: QOL serving static content
-    // TODO: support larger file sizes - send in chunks!
-    // TODO: improve Makefile
-
-    // TODO: ignore favicon.ico
-
     int client_socket;
     while (1) {
         client_socket = accept(server->socket, NULL, NULL);
