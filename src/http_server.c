@@ -15,8 +15,6 @@
 #define NUM_CONNECTIONS_MAX 8
 
 http_server_t* http_server_create() {
-    int err;
-
     http_server_t* server = malloc(sizeof(http_server_t));
     if (!server) {
         wslog(ERRR, "Could not allocate memory for http_server_t");
@@ -74,5 +72,7 @@ int http_server_listen(http_server_t* server, int port) {
     }
 
     wslog(INFO, "Server (%d) listening on port (%d)", server->socket, server->port);
+
+    // move connection loop here
     return 0;
 }

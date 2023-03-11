@@ -1,18 +1,43 @@
-CC=gcc
-CFLAGS=-Iinclude
+### Options ###
 
-exec = server.out
-sources = $(wildcard src/*.c)
-objects = $(sources:.c=.o)
-flags = -g -Werror -Wall -Wpedantic -MMD -lm -ldl -fPIC -rdynamic -I./include
+CC		 := gcc
 
-$(exec): $(objects)
-	gcc $(objects) $(flags) -o $(exec)
+CPPFLAGS := -Iinclude -MMD -MP
+CFLAGS	 := -g -Werror -Wall -Wpedantic
+LDFLAGS	 := -Llib
+LDLIBS	 := -lm
 
-%.o: %.c %.h
-	gcc -c $(flags) $< -o $@
+SRC_DIR	 := src
+OBJ_DIR	 := objects
+BIN_DIR	 := .
+EXECN	 := server
 
-.PHONY: clean
+### Files ###
+
+SRC		 := $(wildcard $(SRC_DIR)/*.c)
+OBJ		 := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+EXEC	 := $(BIN_DIR)/$(EXECN)
+
+### Rules ###
+
+.PHONY: all clean
+
+all: $(EXEC)
+
+$(EXEC): $(OBJ) | $(BIN_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	@echo "Build successful!"
+
+$(BIN_DIR):
+	mkdir -p $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BIN_DIR) $(OBJ_DIR):
+	mkdir -p $@
 
 clean:
-	-rm $(objects) $(exec)
+	@$(RM) -rv $(EXEC) $(OBJ_DIR)
+
+-include $(OBJ:.o=.d)

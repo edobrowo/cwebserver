@@ -6,6 +6,7 @@
 typedef struct {
     uint16_t port;
     int socket;
+    // TODO: routes
 } http_server_t;
 
 // Create a HTTP server

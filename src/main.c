@@ -30,9 +30,10 @@ int main() {
 
     // TODO: routing
     // TODO: QOL serving static content
-    // TODO: support larger file sizes
-    // TODO: fix path field
+    // TODO: support larger file sizes - send in chunks!
     // TODO: improve Makefile
+
+    // TODO: ignore favicon.ico
 
     int client_socket;
     while (1) {
