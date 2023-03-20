@@ -2,7 +2,8 @@
 Web server created in C. Supports small files, serving static content, and simple routing.
 
 TODO:
-* Improved hash table
-* Larger files support
-* Static content QOL
+* Improve the routing hash table
+* Add support for large files
+* Add QOL functions for serving static content
 * Improve favicon.co handling
+* CSS and scripts?
