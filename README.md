@@ -1,8 +1,8 @@
 # C Web Server
-Web server created in C
+Web server created in C. Supports small files, serving static content, and simple routing.
 
 TODO:
-* Routing
-* Support for larger files
-* QOL for serving static content
-* figure out what to do with the favicon.ico GET request
+* Improved hash table
+* Larger files support
+* Static content QOL
+* Improve favicon.co handling

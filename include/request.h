@@ -15,12 +15,14 @@ typedef enum {
 
 typedef struct {
     request_type_t type;
-    const char* host;
-    const char* path;
+    char* host;
+    char* subdir;
 } request_t;
 
-// Initialize a request from a header
-// Currently retrieves request type, host, and URL
-int request_init(request_t* request, char* buf);
+// Create a request structure from a header buffer
+request_t* request_create(char* buf);
+
+// Destroy a request
+void request_destroy(request_t* request);
 
 #endif // REQUEST

@@ -25,26 +25,29 @@ void request_extract_field(const char* field, char* name, char* value) {
     *name = '\0', *value = '\0';
 }
 
-int request_init(request_t* request, char* buf) {
-    wslog(INFO, "Parsing request");
+request_t* request_create(char* buf) {
+    wslog(MORE, "PARSING REQUEST\n%s", buf);
+
+    request_t* request = malloc(sizeof(request_t));
+    if (!request) {
+        wslog(ERRR, "Could not allocate memory for request");
+        return NULL;
+    }
 
     char* type = strtok(buf, " ");
-    request_type_t request_type = str_to_request_type(type);
-    if (request_type == -1) {
-        wslog(ERRR, "Request type (%d) could not be determined", request_type);
-        return -1;
+    request->type = str_to_request_type(type);
+    if (request->type == -1) {
+        wslog(ERRR, "Request type (%d) could not be determined", request->type);
+        return NULL;
     }
-    request->type = request_type;
 
-    // TODO: fix tokenizing of path
-    char* path = strtok(NULL, " ");
-    char* request_path = malloc(strlen(path) * sizeof(char));
-    if (!request_path) {
-        wslog(ERRR, "Could not allocate memory for request->path");
-        return -1;
+    char* subdir = strtok(NULL, " ");
+    request->subdir = malloc((strlen(subdir) + 1) * sizeof(char));
+    if (!request->subdir) {
+        wslog(ERRR, "Could not allocate memory for request->subdir");
+        return NULL;
     }
-    strcpy(request_path, path);
-    request->path = request_path;
+    strcpy(request->subdir, subdir);
 
     char field[2048] = {0};
     char field_name[1024] = {0};
@@ -54,19 +57,25 @@ int request_init(request_t* request, char* buf) {
         request_extract_field(field, field_name, field_value);
 
         if (!strcmp(field_name, "Host")) {
-            char* request_host = malloc(strlen(field_value) * sizeof(char));
-            if (!request_host) {
+            request->host = malloc((strlen(field_value) + 1) * sizeof(char));
+            if (!request->host) {
                 wslog(ERRR, "Could not allocate memory for request->host");
-                return -1;
+                return NULL;
             }
-            strcpy(request_host, field_value);
-            request->host = request_host;
+            strcpy(request->host, field_value);
         }
     }
 
     wslog(MORE, "Request type: %s", type);
     wslog(MORE, "Request host: %s", request->host);
-    wslog(MORE, "Request path: %s", request->path);
+    wslog(MORE, "Request subdirectory: %s", request->subdir);
 
-    return 0;
+    return request;
+}
+
+void request_destroy(request_t* request) {
+    if (!request) return;
+    free((void *)request->host);
+    free((void *)request->subdir);
+    free(request);
 }

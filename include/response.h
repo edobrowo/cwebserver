@@ -33,15 +33,18 @@ typedef enum {
 } response_code_t;
 
 typedef struct {
-    response_code_t code;
+    request_t* request;
     char* data;
     size_t length;
 } response_t;
 
-// Write the response contents to the response buffer
-int response_serialize_content(response_t* response, const char* path);
+// Create a response given a request
+response_t* response_create(request_t* request);
 
-// Initialize a response given a request
-int response_init(response_t* response, request_t* request);
+// Destroy a response
+void response_destroy(response_t* response);
+
+// Write the response contents to the response buffer
+int response_serialize(response_t* response, const char* path);
 
 #endif // RESPONSE

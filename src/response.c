@@ -7,7 +7,48 @@
 
 #include "response.h"
 
-int response_serialize_content(response_t* response, const char* path) {
+response_t* response_create(request_t* request) {
+    response_t* response = malloc(sizeof(response_t));
+    if (!response) {
+        wslog(ERRR, "Could not allocate memory for response");
+        return NULL;
+    } 
+
+    response->request = request;
+
+    switch (request->type) {
+        case GET: break;
+        // Other handlers aren't implemented, so treat as GET :)
+        case HEAD: 
+        case POST:
+        case PUT:
+        case DELETE:
+        case CONNECT:
+        case OPTIONS:
+        case TRACE:
+        case PATCH: break;
+    }
+
+    const char* header_data = "HTTP/1.1 200 OK\r\n\n";
+    response->length = strlen(header_data);
+    response->data = malloc(response->length * sizeof(char));
+    if (!response->data) {
+        wslog(ERRR, "Could not allocate memory for response->data");
+        return NULL;
+    }
+    memcpy(response->data, header_data, response->length);
+
+    return response;
+}
+
+void response_destroy(response_t* response) {
+    if (!response) return;
+    request_destroy(response->request);
+    free(response->data);
+    free(response);
+}
+
+int response_serialize(response_t* response, const char* path) {
     int err;
     FILE* fp;
     long int fs;
@@ -53,52 +94,6 @@ int response_serialize_content(response_t* response, const char* path) {
     err = fclose(fp);
     if (err) {
         wslog(ERRR, "Could not close requested file");
-        return -1;
-    }
-
-    return 0;
-}
-
-int response_init(response_t* response, request_t* request) {
-    int err;
-    if (!request || !request->host || !request->path) {
-        wslog(ERRR, "Can not init response with uninitialized request");
-        return -1;
-    }
-
-    switch (request->type) {
-        case GET: break;
-        // Other handlers aren't implemented, so treat as GET :)
-        case HEAD: 
-        case POST:
-        case PUT:
-        case DELETE:
-        case CONNECT:
-        case OPTIONS:
-        case TRACE:
-        case PATCH: break;
-    }
-
-    // TODO: check if route is valid, 404 if not found
-
-    response->code = OK;
-
-    const char* header_data = "HTTP/1.1 200 OK\r\n\n";
-    size_t header_length = strlen(header_data);
-
-    response->length = header_length;
-    response->data = malloc(response->length * sizeof(char));
-    if (!response->data) {
-        wslog(ERRR, "Could not allocate memory for response->data");
-        return -1;
-    }
-    memcpy(response->data, header_data, header_length);
-
-    // Routing isn't implemented yet, so just always respond with index.html
-    const char* path = "example/index.html";
-    err = response_serialize_content(response, path);
-    if (err) {
-        wslog(ERRR, "Could not serialize (%s)", path);
         return -1;
     }
 

@@ -5,13 +5,14 @@
 #include "log.h"
 
 void wslog(log_msg_t type, const char* format, ...) {
-    char msg[4096] = {0};
 
     switch (type) {
         case INFO: if (!INFO_ENABLED) return; break;
         case MORE: if (!MORE_ENABLED) return; break;
         case ERRR: if (!ERRR_ENABLED) return; break;
     }
+
+    char msg[4096] = {0};
 
     switch (type) {
         case INFO: strcat(msg, "INFO"); break;
